@@ -10,7 +10,6 @@ train_ds = tf.keras.utils.image_dataset_from_directory(
     image_size=(224, 224),s
     batch_size=32
 )
-
 val_ds = tf.keras.utils.image_dataset_from_directory(
     dataset_path,
     validation_split=0.2,
