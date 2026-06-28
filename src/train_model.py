@@ -61,6 +61,29 @@ history = model.fit(
     validation_data=val_ds,
     epochs=5
 )
+import matplotlib.pyplot as plt
+
+# Accuracy Plot
+plt.figure(figsize=(8,5))
+plt.plot(history.history["accuracy"], label="Training Accuracy")
+plt.plot(history.history["val_accuracy"], label="Validation Accuracy")
+plt.xlabel("Epoch")
+plt.ylabel("Accuracy")
+plt.legend()
+plt.title("Training vs Validation Accuracy")
+plt.savefig("accuracy_plot.png")
+plt.show()
+
+# Loss Plot
+plt.figure(figsize=(8,5))
+plt.plot(history.history["loss"], label="Training Loss")
+plt.plot(history.history["val_loss"], label="Validation Loss")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.legend()
+plt.title("Training vs Validation Loss")
+plt.savefig("loss_plot.png")
+plt.show()
 
 # Save Model
 model.save("crop_disease_model.keras")
