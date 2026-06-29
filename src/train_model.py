@@ -1,5 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers, models
+import matplotlib.pyplot as plt
+import json
 
 # Dataset path
 dataset_path = "plantvillage dataset/color"
@@ -24,36 +26,51 @@ val_ds = tf.keras.utils.image_dataset_from_directory(
     batch_size=32
 )
 
+# Print Class Information
+print("\n===================================")
+print("Number of Classes:", len(train_ds.class_names))
+print("===================================")
+
+for i, class_name in enumerate(train_ds.class_names):
+    print(f"{i}: {class_name}")
+
+# Save Class Names
+with open("class_names.json", "w") as f:
+    json.dump(train_ds.class_names, f)
+
+print("\nClass names saved as class_names.json")
+
 # Build CNN Model
 model = models.Sequential([
     layers.Input(shape=(224, 224, 3)),
     layers.Rescaling(1./255),
 
-    layers.Conv2D(32, (3,3), activation='relu'),
+    layers.Conv2D(32, (3,3), activation="relu"),
     layers.MaxPooling2D(2,2),
 
-    layers.Conv2D(64, (3,3), activation='relu'),
+    layers.Conv2D(64, (3,3), activation="relu"),
     layers.MaxPooling2D(2,2),
 
-    layers.Conv2D(128, (3,3), activation='relu'),
+    layers.Conv2D(128, (3,3), activation="relu"),
     layers.MaxPooling2D(2,2),
 
     layers.Flatten(),
 
-    layers.Dense(128, activation='relu'),
+    layers.Dense(128, activation="relu"),
     layers.Dropout(0.5),
 
-    layers.Dense(38, activation='softmax')
+    # Automatically matches the dataset classes
+    layers.Dense(len(train_ds.class_names), activation="softmax")
 ])
 
 # Compile Model
 model.compile(
-    optimizer='adam',
-    loss='sparse_categorical_crossentropy',
-    metrics=['accuracy']
+    optimizer="adam",
+    loss="sparse_categorical_crossentropy",
+    metrics=["accuracy"]
 )
 
-print("Training Started...\n")
+print("\nTraining Started...\n")
 
 # Train Model
 history = model.fit(
@@ -61,7 +78,6 @@ history = model.fit(
     validation_data=val_ds,
     epochs=5
 )
-import matplotlib.pyplot as plt
 
 # Accuracy Plot
 plt.figure(figsize=(8,5))
@@ -69,8 +85,9 @@ plt.plot(history.history["accuracy"], label="Training Accuracy")
 plt.plot(history.history["val_accuracy"], label="Validation Accuracy")
 plt.xlabel("Epoch")
 plt.ylabel("Accuracy")
-plt.legend()
 plt.title("Training vs Validation Accuracy")
+plt.legend()
+plt.grid(True)
 plt.savefig("accuracy_plot.png")
 plt.show()
 
@@ -80,13 +97,17 @@ plt.plot(history.history["loss"], label="Training Loss")
 plt.plot(history.history["val_loss"], label="Validation Loss")
 plt.xlabel("Epoch")
 plt.ylabel("Loss")
-plt.legend()
 plt.title("Training vs Validation Loss")
+plt.legend()
+plt.grid(True)
 plt.savefig("loss_plot.png")
 plt.show()
 
 # Save Model
 model.save("crop_disease_model.keras")
 
-print("\nModel Training Completed Successfully!")
+print("\n===================================")
+print("Model Training Completed Successfully!")
 print("Model saved as crop_disease_model.keras")
+print("Class names saved as class_names.json")
+print("===================================")
